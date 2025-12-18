@@ -89,6 +89,7 @@ export function BlockSettingsDropdown( {
 		openedBlockSettingsMenu,
 		isContentOnly,
 		isZoomOut,
+		canEdit,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -100,6 +101,7 @@ export function BlockSettingsDropdown( {
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
+				canEditBlock,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -125,6 +127,7 @@ export function BlockSettingsDropdown( {
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
+				canEdit: canEditBlock( firstBlockClientId ),
 			};
 		},
 		[ firstBlockClientId ]
@@ -285,7 +288,7 @@ export function BlockSettingsDropdown( {
 											shortcut={ shortcuts.copy }
 										/>
 									) }
-									{ ! isContentOnly && (
+									{ canRemove && ! isContentOnly && (
 										<CopyMenuItem
 											clientIds={ clientIds }
 											label={ __( 'Cut' ) }
@@ -334,7 +337,7 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									{ count === 1 && (
+									{ canEdit && count === 1 && (
 										<CommentIconSlotFill.Slot
 											fillProps={ {
 												clientId: firstBlockClientId,
@@ -351,9 +354,11 @@ export function BlockSettingsDropdown( {
 											label={ __( 'Copy styles' ) }
 											eventType="copyStyles"
 										/>
-										<MenuItem onClick={ onPasteStyles }>
-											{ __( 'Paste styles' ) }
-										</MenuItem>
+										{ canEdit && (
+											<MenuItem onClick={ onPasteStyles }>
+												{ __( 'Paste styles' ) }
+											</MenuItem>
+										) }
 									</MenuGroup>
 								) }
 								{ ! isContentOnly && (
